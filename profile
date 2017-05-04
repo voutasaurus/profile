@@ -88,3 +88,5 @@ source '/usr/local/bin/google-cloud-sdk/completion.bash.inc'
 alias shrug='echo "¯\_(ツ)_/¯"'
 
 alias missionfire='curl isthemissiononfire.com 2>/dev/null | grep h1 | sed "s/<h1>//" | sed "s?</h1>??"'
+
+alias improv101='yes &' # prints y forever and backgrounds the job to make it more annoying to stop
