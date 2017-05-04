@@ -66,6 +66,11 @@ function vendored {
 	go list -f {{.Deps}} | tr ' ' "\n" | grep '^'"$1"'/vendor' | sed 's%'"$1"'/vendor/%%'
 }
 
+# Certs
+function newcert {
+	go run /usr/local/go/src/crypto/tls/generate_cert.go --host $1
+}
+
 # Node: run setup for Node
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
