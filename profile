@@ -6,6 +6,9 @@ function exportf {
 	export $(xargs <$1)
 }
 
+# Generic bash sugar
+alias please='yes |'
+
 # Filesystem
 alias l='ls -lah'
 alias pls='pwd && ls'
