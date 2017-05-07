@@ -15,6 +15,14 @@ alias pls='pwd && ls'
 alias filesopen='sudo lsof | wc -l'
 alias ll='wc -l * | sort -n'
 
+function ca {
+	if [ -d "$1" -o -z "$1" ]; then
+		ls $1
+		return
+	fi
+	cat $1
+}
+
 # Clipboard
 function pb {
 	pbpaste | $1 | pbcopy
