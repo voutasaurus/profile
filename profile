@@ -1,3 +1,5 @@
+export PROFILE=$PROFILE:$BASH_SOURCE
+
 # Environment and Profile
 alias path='echo $PATH | tr : "\n"'
 alias ..='. ~/.bash_profile'
