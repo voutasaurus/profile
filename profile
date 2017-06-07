@@ -8,6 +8,12 @@ function exportf {
 	export $(xargs <$1)
 }
 
+function maybe {
+	if [ -f $1 ]
+	then . $1
+	fi
+}
+
 # Generic bash sugar
 alias please='yes |'
 
@@ -33,6 +39,9 @@ function pb {
 # Git
 alias gitlog='git log --pretty=oneline --abbrev-commit'
 
+# Productivity
+alias today='vim $HOME/today'
+
 # Network
 alias flushdns='sudo killall -HUP mDNSResponder'
 alias watch='watch -n1 '
@@ -48,6 +57,12 @@ function xoni {
 function ip {
 	curl https://ipinfo.io/$1 2>/dev/null | jq
 }
+
+function ng {
+	nghttp -nv "https://$1"
+}
+
+# h2i google.com:443
 
 # Graph
 function g {
@@ -89,10 +104,13 @@ function newcert {
 
 # Google Cloud: run setup for Google Cloud
 # The next line updates PATH for the Google Cloud SDK.
-source '/usr/local/bin/google-cloud-sdk/path.bash.inc'
+maybe '/usr/local/bin/google-cloud-sdk/path.bash.inc'
 
 # The next line enables shell command completion for gcloud.
-source '/usr/local/bin/google-cloud-sdk/completion.bash.inc'
+maybe '/usr/local/bin/google-cloud-sdk/completion.bash.inc'
+
+# Azure
+maybe $HOME/lib/azure-cli/az.completion
 
 # Fun
 alias shrug='echo "¯\_(ツ)_/¯"'
