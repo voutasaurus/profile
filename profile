@@ -46,6 +46,8 @@ alias today='vim $HOME/today'
 alias flushdns='sudo killall -HUP mDNSResponder'
 alias watch='watch -n1 '
 
+alias status='curl -sw "%{http_code}\n" -o /dev/null'
+
 function xon {
 	curl -v --resolve "$1:443:$2" https://$1
 }
