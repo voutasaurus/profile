@@ -39,6 +39,10 @@ function pb {
 # Git
 alias gitlog='git log --pretty=oneline --abbrev-commit'
 
+function changes {
+	git log --pretty=oneline --abbrev-commit $1..HEAD $2
+}
+
 # Productivity
 alias today='vim $HOME/today'
 
@@ -66,6 +70,10 @@ function ng {
 
 # h2i google.com:443
 
+function caa {
+	dig @8.8.8.8 $1 type257
+}
+
 # Graph
 function g {
 	dot -Tsvg $1 > o.svg
@@ -85,7 +93,7 @@ alias failure='notify "Failed" "operation failed" "Basso"'
 
 # Go
 function gov {
-	docker run -v $HOME/go/src:/go/src -it golang:$1 bash
+	docker run -v $HOME/go/src:/root/go/src -it golang:$1 bash
 }
 
 function lf {
