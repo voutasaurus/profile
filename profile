@@ -74,6 +74,8 @@ function caa {
 	dig @8.8.8.8 $1 type257
 }
 
+alias checktls='for domain in $(pbpaste); do curl https://$domain 2>/dev/null 1>/dev/null; echo $domain = $?; done'
+
 # Graph
 function g {
 	dot -Tsvg $1 > o.svg
@@ -104,9 +106,15 @@ function vendored {
 	go list -f {{.Deps}} | tr ' ' "\n" | grep '^'"$1"'/vendor' | sed 's%'"$1"'/vendor/%%'
 }
 
+alias goescape='go build -gcflags "-m"'
+
 # Certs
 function newcert {
 	go run /usr/local/go/src/crypto/tls/generate_cert.go --host $1
+}
+
+function newca {
+	go run /usr/local/go/src/crypto/tls/generate_cert.go --host none --ca --duration=$[20*365*24]h --ecdsa-curve=P256
 }
 
 # Node: run setup for Node
