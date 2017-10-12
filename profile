@@ -76,6 +76,11 @@ function caa {
 
 alias checktls='for domain in $(pbpaste); do curl https://$domain 2>/dev/null 1>/dev/null; echo $domain = $?; done'
 
+function simple {
+	open http://localhost:8000/
+	python -m SimpleHTTPServer 8000
+}
+
 # Graph
 function g {
 	dot -Tsvg $1 > o.svg
