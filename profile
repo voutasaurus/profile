@@ -122,6 +122,18 @@ function newca {
 	go run /usr/local/go/src/crypto/tls/generate_cert.go --host none --ca --duration=$[20*365*24]h --ecdsa-curve=P256
 }
 
+# Machine Learning
+
+alias tenseup='source ~/tensorflow/bin/activate'
+
+function packerup {
+	set -x
+	minikube start
+	pachctl deploy local
+	kubectl get all
+	set +x
+}
+
 # Node: run setup for Node
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
