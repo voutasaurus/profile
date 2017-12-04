@@ -100,7 +100,7 @@ alias failure='notify "Failed" "operation failed" "Basso"'
 
 # Go
 function gov {
-	docker run -v $HOME/go/src:/root/go/src -it golang:$1 bash
+	docker run -v $HOME/go/src:/go/src -it golang:$1 bash
 }
 
 function lf {
