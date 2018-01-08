@@ -81,6 +81,14 @@ function simple {
 	python -m SimpleHTTPServer 8000
 }
 
+# Kubernetes
+
+function kubeip {
+	kubectl get pod $1 -o go-template='{{.status.podIP}}'
+}
+
+alias kubesh='kubectl run busybox --image=busybox --restart=Never --tty -i --generator=run-pod/v1'
+
 # Graph
 function g {
 	dot -Tsvg $1 > o.svg
@@ -120,6 +128,26 @@ function newcert {
 
 function newca {
 	go run /usr/local/go/src/crypto/tls/generate_cert.go --host none --ca --duration=$[20*365*24]h --ecdsa-curve=P256
+}
+
+# Package Management
+
+# usage: installdmg https://example.com/path/to/pkg.dmg
+function installdmg {
+	set -x
+	tempd=$(mktemp -d)
+	curl $1 > $tempd/pkg.dmg
+	listing=$(sudo hdiutil attach $tempd/pkg.dmg | grep Volumes)
+	volume=$(echo "$listing" | cut -f 3)
+	if [ -e "$volume"/*.app ]; then
+	  sudo cp -rf "$volume"/*.app /Applications
+	elif [ -e "$volume"/*.pkg ]; then
+	  package=$(ls -1 | grep *.pkg | head -1)
+	  sudo installer -pkg "$volume"/"$package".pkg -target /
+	fi
+	sudo hdiutil detach "$(echo "$listing" | cut -f 1)"
+	rm -rf $tempd
+	set +x
 }
 
 # Machine Learning
