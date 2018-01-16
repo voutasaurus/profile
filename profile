@@ -23,6 +23,8 @@ alias pls='pwd && ls'
 alias filesopen='sudo lsof | wc -l'
 alias ll='wc -l * | sort -n'
 
+alias find='find . -name'
+
 function ca {
 	if [ -d "$1" -o -z "$1" ]; then
 		ls $1
@@ -83,11 +85,27 @@ function simple {
 
 # Kubernetes
 
+alias kubevm='vboxmanage list vms --long | grep -e "Name:" -e "State:"'
+
 function kubeip {
 	kubectl get pod $1 -o go-template='{{.status.podIP}}'
 }
 
+function kubesrvip {
+	kubectl get service $1 -o go-template='{{.spec.clusterIP}}'
+}
+
+function kubesrvport {
+	kubectl get service $1 -o go-template='{{(index .spec.ports 0).port}}'
+}
+
+function kubesrvaddr {
+	echo "$(kubesrvip $1)":"$(kubesrvport $1)"
+}
+
 alias kubesh='kubectl run busybox --image=busybox --restart=Never --tty -i --generator=run-pod/v1'
+
+alias kubereset='minikube delete && minikube start --kubernetes-version v1.7.0'
 
 # Graph
 function g {
