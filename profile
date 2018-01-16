@@ -85,6 +85,8 @@ function simple {
 
 # Kubernetes
 
+alias kubectx='kubectl config current-context'
+
 alias kubevm='vboxmanage list vms --long | grep -e "Name:" -e "State:"'
 
 function kubeip {
@@ -189,6 +191,9 @@ maybe '/usr/local/bin/google-cloud-sdk/path.bash.inc'
 
 # The next line enables shell command completion for gcloud.
 maybe '/usr/local/bin/google-cloud-sdk/completion.bash.inc'
+
+alias gprojects='gcloud projects list'
+alias gcontext='gcloud config get-value project'
 
 # Azure
 maybe $HOME/lib/azure-cli/az.completion
