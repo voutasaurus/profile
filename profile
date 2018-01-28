@@ -33,6 +33,11 @@ function ca {
 	cat $1
 }
 
+# usage: envset VERSION 1.0.0 env.sh
+function envset {
+	sed -ie s/^$1=.*$/$1=$2/ $3
+}
+
 # Clipboard
 function pb {
 	pbpaste | $1 | pbcopy
@@ -47,6 +52,9 @@ function changes {
 
 # Productivity
 alias today='vim $HOME/today'
+
+# vim
+alias vim='nvim'
 
 # Network
 alias flushdns='sudo killall -HUP mDNSResponder'
@@ -86,6 +94,8 @@ function simple {
 # Kubernetes
 
 alias kubectx='kubectl config current-context'
+
+alias kubedns='kubectl get pods --namespace=kube-system -l k8s-app=kube-dns'
 
 alias kubevm='vboxmanage list vms --long | grep -e "Name:" -e "State:"'
 
