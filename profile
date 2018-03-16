@@ -17,6 +17,9 @@ function maybe {
 # Generic bash sugar
 alias please='yes |'
 
+# Random
+alias pp='base64 < /dev/urandom | head -c'
+
 # Filesystem
 alias l='ls -lah'
 alias pls='pwd && ls'
@@ -91,6 +94,14 @@ function simple {
 	python -m SimpleHTTPServer 8000
 }
 
+function fetchdir {
+	local pempath=${1}
+	local user=${2}
+	local remotehost=${3}
+	local dirpath=${4}
+	scp -r -i $pempath $user@$remotehost:$dirpath .
+}
+
 # Kubernetes
 
 alias kubectx='kubectl config current-context'
@@ -117,7 +128,7 @@ function kubesrvaddr {
 
 alias kubesh='kubectl run busybox --image=busybox --restart=Never --tty -i --generator=run-pod/v1'
 
-alias kubereset='minikube delete && minikube start --kubernetes-version v1.7.0'
+alias kubereset='minikube delete && minikube start --kubernetes-version v1.8.0'
 
 # Graph
 function g {
