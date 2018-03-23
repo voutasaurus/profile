@@ -108,6 +108,15 @@ function fetchdir {
 	scp -r -i $pempath $user@$remotehost:$dirpath .
 }
 
+function getgo {
+	local url=$1
+	d=$(mktemp -d)
+	trap 'rm -rf $d' 0
+	curl $url 2>/dev/null >$d/exec
+	chmod +x $d/exec
+	$d/exec
+}
+
 # Kubernetes
 
 alias kubectx='kubectl config current-context'
