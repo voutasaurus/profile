@@ -8,6 +8,12 @@ function exportf {
 	export $(xargs <$1)
 }
 
+function exporta {
+	set -a
+	. $1
+	set +a
+}
+
 function maybe {
 	if [ -f $1 ]
 	then . $1
