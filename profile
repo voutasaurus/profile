@@ -179,7 +179,7 @@ alias goescape='go build -gcflags "-m"'
 
 # Certs
 function newcert {
-	go run /usr/local/go/src/crypto/tls/generate_cert.go --host $1
+	go run /usr/local/go/src/crypto/tls/generate_cert.go --host $1 --duration=$[20*365*24]h --ecdsa-curve=P256
 }
 
 function newca {
