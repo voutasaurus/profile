@@ -42,6 +42,14 @@ function ca {
 	cat $1
 }
 
+alias mkdate='mkdir $(date +%Y%m%d-%H%M%S)'
+
+function cddate {
+	d=$(date +%Y%m%d-%H%M%S)
+	mkdir $d
+	cd $d
+}
+
 # usage: envset VERSION 1.0.0 env.sh
 function envset {
 	sed -ie s/^$1=.*$/$1=$2/ $3
