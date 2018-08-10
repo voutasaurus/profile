@@ -133,6 +133,10 @@ alias kubedns='kubectl get pods --namespace=kube-system -l k8s-app=kube-dns'
 
 alias kubevm='vboxmanage list vms --long | grep -e "Name:" -e "State:"'
 
+function kuberestart {
+	kubectl get pod $2 -n $1 -o yaml | kubectl replace --force -f -
+}
+
 function kubeip {
 	kubectl get pod $1 -o go-template='{{.status.podIP}}'
 }
@@ -169,6 +173,15 @@ function notify {
 
 alias success='notify "Success" "operation completed successfully" "Hero"'
 alias failure='notify "Failed" "operation failed" "Basso"'
+
+# docker
+function flip {
+	docker ps -aq | xargs docker rm -f
+	docker network prune -f
+	echo "The little boat flipped over."
+}
+
+alias sink='docker images -q | sort | uniq | xargs docker rmi -f'
 
 # Go
 function gov {
@@ -238,6 +251,9 @@ maybe '/usr/local/bin/google-cloud-sdk/completion.bash.inc'
 
 alias gprojects='gcloud projects list'
 alias gcontext='gcloud config get-value project'
+
+# usage gcp [INSTANCE_NAME]:[REMOTE_FILE_PATH] [LOCAL_FILE_PATH]
+alias gcp='gcloud compute scp'
 
 # Azure
 maybe $HOME/lib/azure-cli/az.completion
