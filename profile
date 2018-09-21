@@ -71,13 +71,17 @@ function changes {
 alias today='vim $HOME/today'
 
 # vim
-alias vim='nvim'
+alias vim='GO111MODULE=off nvim'
 
 # Network
 alias flushdns='sudo killall -HUP mDNSResponder'
 alias watch='watch -n1 '
 
 alias status='curl -sw "%{http_code}\n" -o /dev/null'
+
+function ports {
+	grep -oE ':[0-9]{1,5}' | sort | uniq
+}
 
 function xon {
 	curl -v --resolve "$1:443:$2" https://$1
@@ -196,6 +200,9 @@ function vendored {
 	go list -f {{.Deps}} | tr ' ' "\n" | grep '^'"$1"'/vendor' | sed 's%'"$1"'/vendor/%%'
 }
 
+alias goget='GO111MODULE=off go get'
+
+# debug type checking
 alias goescape='go build -gcflags "-m"'
 
 # Certs
