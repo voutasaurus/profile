@@ -161,6 +161,26 @@ alias kubesh='kubectl run session-$USER --restart=Never --generator=run-pod/v1 -
 
 alias kubereset='minikube delete && minikube start --kubernetes-version v1.8.0'
 
+function kubens {
+	kubectl get namespaces -o go-template='{{ range $x, $v := .items }}{{$v.metadata.name | printf "%s\n"}}{{ end }}'
+}
+
+function kubesvc {
+	xargs -I nspace kubectl --namespace=nspace get services -o go-template='{{ range $x, $v := .items }}{{$v.metadata.name | printf "%s.nspace.svc.cluster.local\n"}}{{ end }}'
+}
+
+function kubeport {
+	xargs -I nspace kubectl --namespace=nspace get services -o go-template='{{ range $x, $v := .items }}{{range $j, $port := $v.spec.ports}}{{printf "%s.nspace.svc.cluster.local:%v\n" $v.metadata.name $port.port}}{{end}}{{ end }}'
+}
+
+function kubedomains {
+	kubens | grep -v "kube-system" | grep -v "kube-public" | kubesvc
+}
+
+function kubeports {
+	kubens | grep -v "kube-system" | grep -v "kube-public" | kubeport
+}
+
 # Graph
 function g {
 	dot -Tsvg $1 > o.svg
