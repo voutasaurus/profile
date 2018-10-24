@@ -131,8 +131,6 @@ function getgo {
 
 # Kubernetes
 
-alias kubectx='kubectl config current-context'
-
 alias kubedns='kubectl get pods --namespace=kube-system -l k8s-app=kube-dns'
 
 alias kubevm='vboxmanage list vms --long | grep -e "Name:" -e "State:"'
@@ -157,39 +155,7 @@ function kubesrvaddr {
 	echo "$(kubesrvip $1)":"$(kubesrvport $1)"
 }
 
-alias kubesh='kubectl run session-$USER --restart=Never --generator=run-pod/v1 --rm -i --tty --image=centos -- bash'
-
 alias kubereset='minikube delete && minikube start --kubernetes-version v1.8.0'
-
-function kubens {
-	kubectl get namespaces -o go-template='{{ range $x, $v := .items }}{{$v.metadata.name | printf "%s\n"}}{{ end }}'
-}
-
-function kubesvc {
-	xargs -I nspace kubectl --namespace=nspace get services -o go-template='{{ range $x, $v := .items }}{{$v.metadata.name | printf "%s.nspace.svc.cluster.local\n"}}{{ end }}'
-}
-
-function kubeports {
-	xargs -I nspace kubectl --namespace=nspace get services -o go-template='{{ range $x, $v := .items }}{{range $j, $port := $v.spec.ports}}{{printf "%s.nspace.svc.cluster.local:%v\n" $v.metadata.name $port.port}}{{end}}{{ end }}'
-}
-
-function kubedomains {
-	kubens | grep -v "kube-system" | grep -v "kube-public" | kubesvc
-}
-
-function kubeaddrs {
-	kubens | grep -v "kube-system" | grep -v "kube-public" | kubeports
-}
-
-# usage: kubewarp service.namespace.svc.cluster.local:12345
-# The internal domain:port is as output by kubeaddrs
-function kubewarp {
-	local domain=$(echo $1 | cut -d ":" -f 1)
-	local port=$(echo $1 | cut -d ":" -f 2)
-	local host=$(echo $domain | cut -d "." -f 1)
-	local namespace=$(echo $domain | cut -d "." -f 2)
-	kubectl --namespace=$namespace port-forward svc/$host $port:$port
-}
 
 # Graph
 function g {
