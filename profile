@@ -169,7 +169,7 @@ function kubesvc {
 	xargs -I nspace kubectl --namespace=nspace get services -o go-template='{{ range $x, $v := .items }}{{$v.metadata.name | printf "%s.nspace.svc.cluster.local\n"}}{{ end }}'
 }
 
-function kubeport {
+function kubeports {
 	xargs -I nspace kubectl --namespace=nspace get services -o go-template='{{ range $x, $v := .items }}{{range $j, $port := $v.spec.ports}}{{printf "%s.nspace.svc.cluster.local:%v\n" $v.metadata.name $port.port}}{{end}}{{ end }}'
 }
 
@@ -177,8 +177,18 @@ function kubedomains {
 	kubens | grep -v "kube-system" | grep -v "kube-public" | kubesvc
 }
 
-function kubeports {
-	kubens | grep -v "kube-system" | grep -v "kube-public" | kubeport
+function kubeaddrs {
+	kubens | grep -v "kube-system" | grep -v "kube-public" | kubeports
+}
+
+# usage: kubewarp service.namespace.svc.cluster.local:12345
+# The internal domain:port is as output by kubeaddrs
+function kubewarp {
+	local domain=$(echo $1 | cut -d ":" -f 1)
+	local port=$(echo $1 | cut -d ":" -f 2)
+	local host=$(echo $domain | cut -d "." -f 1)
+	local namespace=$(echo $domain | cut -d "." -f 2)
+	kubectl --namespace=$namespace port-forward svc/$host $port:$port
 }
 
 # Graph
