@@ -157,7 +157,7 @@ function kubesrvaddr {
 	echo "$(kubesrvip $1)":"$(kubesrvport $1)"
 }
 
-alias kubesh='kubectl run busybox --image=busybox --restart=Never --tty -i --generator=run-pod/v1'
+alias kubesh='kubectl run session-$USER --restart=Never --generator=run-pod/v1 --rm -i --tty --image=centos -- bash'
 
 alias kubereset='minikube delete && minikube start --kubernetes-version v1.8.0'
 
