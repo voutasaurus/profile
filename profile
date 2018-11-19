@@ -27,7 +27,7 @@ alias please='yes |'
 alias pp='base64 < /dev/urandom | head -c'
 
 # Filesystem
-alias l='ls -lah'
+alias l='ls -halt'
 alias pls='pwd && ls'
 alias filesopen='sudo lsof | wc -l'
 alias ll='wc -l * | sort -n'
@@ -66,6 +66,8 @@ alias gitlog='git log --pretty=oneline --abbrev-commit'
 function changes {
 	git log --pretty=oneline --abbrev-commit $1..HEAD $2
 }
+
+alias standup='git-standup'
 
 # Productivity
 alias today='vim $HOME/today'
@@ -156,6 +158,23 @@ function kubesrvaddr {
 }
 
 alias kubereset='minikube delete && minikube start --kubernetes-version v1.8.0'
+
+function kubepod {
+	xargs -I nspace kubectl --namespace=nspace get pods -o go-template='{{range $i, $v := .items}}{{$v.metadata.name | printf "%s.nspace\n"}}{{end}}'
+}
+
+function kubepods {
+	kubens | grep -v "kube-system" | grep -v "kube-public" | kubepod
+}
+
+function kuberun {
+	local pod=$(echo $1 | cut -d "." -f 1)
+	local ns=$(echo $1 | cut -d "." -f 2)
+
+	GOOS=linux go build -o runner .
+	kubectl cp runner $ns/$pod:/runner
+	kubectl --namespace=$ns exec -it $pod -- /runner
+}
 
 # Graph
 function g {
