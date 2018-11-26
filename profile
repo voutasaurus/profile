@@ -217,8 +217,11 @@ function vendored {
 
 alias goget='GO111MODULE=off go get'
 
-# debug type checking
+# Go debug type checking
 alias goescape='go build -gcflags "-m"'
+
+# Go pprof (local)
+# see: https://godoc.org/github.com/rakyll/autopprof
 
 # Certs
 function newcert {
