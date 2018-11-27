@@ -176,6 +176,14 @@ function kuberun {
 	kubectl --namespace=$ns exec -it $pod -- /runner
 }
 
+function kubeportal {
+    local domain=$(echo $1 | cut -d ":" -f 1)
+    local port=$(echo $1 | cut -d ":" -f 2)
+    local host=$(echo $domain | cut -d "." -f 1)
+    local namespace=$(echo $domain | cut -d "." -f 2)
+    kubectl --namespace=$namespace port-forward svc/$host :$port
+}
+
 # Graph
 function g {
 	dot -Tsvg $1 > o.svg
