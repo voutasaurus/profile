@@ -69,11 +69,17 @@ function changes {
 
 alias standup='git-standup'
 
+function repo {
+	gh mk $1
+	git clone https://github.com/voutasaurus/$1
+	cd $1
+}
+
 # Productivity
 alias today='vim $HOME/today'
 
 # vim
-alias vim='GO111MODULE=off nvim'
+alias vim='nvim'
 
 # Network
 alias flushdns='sudo killall -HUP mDNSResponder'
