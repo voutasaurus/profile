@@ -28,6 +28,7 @@ alias pp='base64 < /dev/urandom | head -c'
 
 # Filesystem
 alias l='ls -halt'
+alias recent='l | head'
 alias pls='pwd && ls'
 alias filesopen='sudo lsof | wc -l'
 alias ll='wc -l * | sort -n'
