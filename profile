@@ -25,6 +25,14 @@ alias please='yes |'
 
 # Random
 alias pp='base64 < /dev/urandom | head -c'
+function pp2 {
+	head /dev/urandom | LC_ALL=C tr -dc A-Za-z0-9 | head -c $1 ; echo ''
+}
+
+# Time
+function epochtodate {
+	date -r $1 '+%m/%d/%Y:%H:%M:%S'
+}
 
 # Filesystem
 alias l='ls -halt'
@@ -183,13 +191,13 @@ function kuberun {
 	kubectl --namespace=$ns exec -it $pod -- /runner
 }
 
-function kubeportal {
-    local domain=$(echo $1 | cut -d ":" -f 1)
-    local port=$(echo $1 | cut -d ":" -f 2)
-    local host=$(echo $domain | cut -d "." -f 1)
-    local namespace=$(echo $domain | cut -d "." -f 2)
-    kubectl --namespace=$namespace port-forward svc/$host :$port
-}
+# function kubeportal {
+#     local domain=$(echo $1 | cut -d ":" -f 1)
+#     local port=$(echo $1 | cut -d ":" -f 2)
+#     local host=$(echo $domain | cut -d "." -f 1)
+#     local namespace=$(echo $domain | cut -d "." -f 2)
+#     kubectl --namespace=$namespace port-forward svc/$host :$port
+# }
 
 # Graph
 function g {
