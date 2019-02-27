@@ -112,6 +112,14 @@ function ip {
 	curl https://ipinfo.io/$1 2>/dev/null | jq
 }
 
+function statusbork {
+	if [ $1 -ge 400 ]
+	then
+	    >&2 echo "statusbork(22): curl recieved status code $1"
+	    exit 22
+	fi
+}
+
 function ng {
 	nghttp -nv "https://$1"
 }
