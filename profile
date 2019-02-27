@@ -59,6 +59,11 @@ function cddate {
 	cd $d
 }
 
+function touchx {
+	touch $1
+	chmod +x $1
+}
+
 # usage: envset VERSION 1.0.0 env.sh
 function envset {
 	sed -ie s/^$1=.*$/$1=$2/ $3
