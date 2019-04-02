@@ -99,6 +99,8 @@ alias vim='nvim'
 alias flushdns='sudo killall -HUP mDNSResponder'
 alias watch='watch -n1 '
 
+alias dns='dig +short'
+
 alias status='curl -sw "%{http_code}\n" -o /dev/null'
 
 function ports {
