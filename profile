@@ -74,6 +74,7 @@ function zipdiff {
 	unzip -qq $before *
 	git add . &> /dev/null
 	git commit -m "before" &> /dev/null  
+	rm -rf $tempdir/*
 	yes | unzip -qq $after * &> /dev/null
 	git add .
 	git diff --cached
