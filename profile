@@ -64,24 +64,6 @@ function touchx {
 	chmod +x $1
 }
 
-function zipdiff {
-	current=$(pwd)
-	before="$current/$1"
-	after="$current/$2"
-	tempdir=$(mktemp -d)
-	cd $tempdir
-	git init &> /dev/null
-	unzip -qq $before *
-	git add . &> /dev/null
-	git commit -m "before" &> /dev/null  
-	rm -rf $tempdir/*
-	yes | unzip -qq $after * &> /dev/null
-	git add .
-	git diff --cached
-	cd $current
-	rm -rf $tempdir
-}
-
 # usage: envset VERSION 1.0.0 env.sh
 function envset {
 	sed -ie s/^$1=.*$/$1=$2/ $3

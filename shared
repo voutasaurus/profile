@@ -31,3 +31,35 @@ function kubewarp {
 	local namespace=$(echo $domain | cut -d "." -f 2)
 	kubectl --namespace=$namespace port-forward svc/$host $port:$port
 }
+
+# usage: ctx gs://bucketname/envname
+function ctx {
+  if [ $# -eq 0 ]; then
+    gsutil ls -a gs://bucketname | cut -f1 -d"#" | sort -u
+    return
+  fi
+
+  temp=$(mktemp)
+  gsutil cp $1 temp &> /dev/null
+  chmod +x temp
+  source temp
+  rm temp
+}
+
+function zipdiff {
+	current=$(pwd)
+	before="$current/$1"
+	after="$current/$2"
+	tempdir=$(mktemp -d)
+	cd $tempdir
+	git init &> /dev/null
+	unzip -qq $before *
+	git add . &> /dev/null
+	git commit -m "before" &> /dev/null
+	rm -rf $tempdir/*
+	yes | unzip -qq $after * &> /dev/null
+	git add .
+	git diff --cached
+	cd $current
+	rm -rf $tempdir
+}
