@@ -20,6 +20,16 @@ function maybe {
 	fi
 }
 
+# Terminal magic
+#
+# ctrl+x+e (open an editor to write a long command)
+#
+
+# open an editor to fix the previous command
+alias fixcommand=fc
+
+alias retire='disown -a && exit'
+
 # Generic bash sugar
 alias please='yes |'
 
@@ -124,6 +134,13 @@ function statusbork {
 	then
 	    >&2 echo "statusbork(22): curl recieved status code $1"
 	    exit 22
+	fi
+}
+
+function pork {
+	pid=$(lsof -ti tcp:$1)
+	if [[ $pid ]]; then
+		kill -9 $pid
 	fi
 }
 
