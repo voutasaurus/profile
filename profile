@@ -28,7 +28,12 @@ function maybe {
 # magic prompt
 # To use export PROMPT_COMMAND=prompter
 function prompter {
-  export PS1="$(kubectl config current-context)""$ "
+  export PS1="$(promptext)""$ "
+}
+
+function promptext {
+  # edit to provide more context (see kprompter for example)
+  echo -n ""
 }
 
 # open an editor to fix the previous command
@@ -193,6 +198,14 @@ function getgo {
 }
 
 # Kubernetes
+
+# To use kprompter, call kprompt to set PROMPT_COMMAND alias
+function kprompter {
+  export PS1="$(kubectl config current-context)""$ "
+}
+
+# kprompt
+alias kprompt='PROMPT_COMMAND=kprompter'
 
 alias kubectx='kubectl config current-context'
 
