@@ -25,6 +25,12 @@ function maybe {
 # ctrl+x+e (open an editor to write a long command)
 #
 
+# magic prompt
+# To use export PROMPT_COMMAND=prompter
+function prompter {
+  export PS1="$(kubectl config current-context)""$ "
+}
+
 # open an editor to fix the previous command
 alias fixcommand=fc
 
@@ -37,6 +43,14 @@ alias please='yes |'
 alias pp='base64 < /dev/urandom | head -c'
 function pp2 {
 	head /dev/urandom | LC_ALL=C tr -dc A-Za-z0-9 | head -c $1 ; echo ''
+}
+
+# base64
+
+function decodex {
+    echo -n "$1 = "
+    echo $2 | base64 --decode
+    echo ""
 }
 
 # Time
@@ -180,6 +194,21 @@ function getgo {
 
 # Kubernetes
 
+alias kubectx='kubectl config current-context'
+
+alias kubesh='kubectl run session-$USER --restart=Never --generator=run-pod/v1 --rm -i --tty --image=centos -- bash'
+
+alias kubebounce='kubectl get pods -o json | jq .items[].metadata.name -r | grep -v session | grep -v tiller | xargs kubectl delete pod'
+
+function secrets {
+    export -f decodex
+    kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s %s\n" $k $v }}{{ end }}' | xargs -n 2 -I{} bash -c 'decodex {}'
+}
+
+function kubeaddrs {
+    kubectl get services -o go-template='{{ range $x, $v := .items }}{{range $j, $port := $v.spec.ports}}{{printf "%s:%v\n" $v.metadata.name $port.port}}{{end}}{{ end }}'
+}
+
 alias kubedns='kubectl get pods --namespace=kube-system -l k8s-app=kube-dns'
 
 alias kubevm='vboxmanage list vms --long | grep -e "Name:" -e "State:"'
@@ -278,7 +307,14 @@ alias goescape='go build -gcflags "-m"'
 # Go pprof (local)
 # see: https://godoc.org/github.com/rakyll/autopprof
 
-# Certs
+# Certs / keys
+#
+
+function newkey {
+  openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
+  openssl ec -in ec_private.pem -pubout -out ec_public.pem
+}
+
 function newcert {
 	go run /usr/local/go/src/crypto/tls/generate_cert.go --host $1 --duration=$[20*365*24]h --ecdsa-curve=P256
 }

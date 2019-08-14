@@ -1,7 +1,3 @@
-alias kubectx='kubectl config current-context'
-
-alias kubesh='kubectl run session-$USER --restart=Never --generator=run-pod/v1 --rm -i --tty --image=centos -- bash'
-
 function kubens {
 	kubectl get namespaces -o go-template='{{ range $x, $v := .items }}{{$v.metadata.name | printf "%s\n"}}{{ end }}'
 }
