@@ -218,6 +218,28 @@ function secrets {
     kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s %s\n" $k $v }}{{ end }}' | xargs -n 2 -I{} bash -c 'decodex {}'
 }
 
+function sekret {
+    local out=$(kubectl get secrets $1 -o go-template="{{.data.$2}}")
+    if [ "$out" == "<no value>" ]; then
+       >&2 echo "$2 not set in $1";
+       return 1;
+    fi
+    echo -n $out | base64 --decode
+    >&2 echo ""
+}
+
+function sekretset {
+    kubectl patch secrets $1 -p '{"data":{"'"$2"'":"'"$(echo -n $3 | base64)"'"}}'
+}
+
+function sekretscan {
+    kubectl get secrets -o json | jq .items[].metadata.name -r | grep -v default | grep -v regcred | while read x; do echo -n $x": "; sekret $x $1; done
+}
+
+function sekkeys {
+    kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s\n" $k }}{{ end }}'
+}
+
 function kubeaddrs {
     kubectl get services -o go-template='{{ range $x, $v := .items }}{{range $j, $port := $v.spec.ports}}{{printf "%s:%v\n" $v.metadata.name $port.port}}{{end}}{{ end }}'
 }
