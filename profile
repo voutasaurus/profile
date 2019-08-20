@@ -273,6 +273,8 @@ function kuberun {
 #     kubectl --namespace=$namespace port-forward svc/$host :$port
 # }
 
+alias chartout='helm template --values helm-config/values.yaml --output-dir output helm-config'
+
 # Graph
 function g {
 	dot -Tsvg $1 > o.svg
