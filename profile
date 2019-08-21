@@ -145,7 +145,7 @@ function xoni {
 }
 
 function ip {
-	curl https://ipinfo.io/$1 2>/dev/null | jq
+	curl https://ipinfo.io/$1 2>/dev/null
 }
 
 function statusbork {
@@ -198,6 +198,11 @@ function getgo {
 }
 
 # Kubernetes
+function chartout {
+    stat helm-config >/dev/null && \
+    mkdir -p output && \
+    helm template --values helm-config/values.yaml --output-dir output helm-config
+}
 
 # To use kprompter, call kprompt to set PROMPT_COMMAND alias
 function kprompter {
@@ -218,7 +223,7 @@ function kubesh {
     fi
 }
 
-alias kubebounce='kubectl get pods -o json | jq .items[].metadata.name -r | grep -v session | grep -v tiller | xargs kubectl delete pod'
+alias kubebounce='kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v session | grep -v tiller | xargs kubectl delete pod'
 
 function secrets {
     export -f decodex
@@ -239,16 +244,23 @@ function sekretset {
     kubectl patch secrets $1 -p '{"data":{"'"$2"'":"'"$(echo -n $3 | base64)"'"}}'
 }
 
-function sekretscan {
-    kubectl get secrets -o json | jq .items[].metadata.name -r | grep -v default | grep -v regcred | while read x; do echo -n $x": "; sekret $x $1; done
-}
-
 function sekkeys {
     kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s\n" $k }}{{ end }}'
 }
 
+# scan each secret object to see what an environment variable is set to
+# usage:
+# $ sekretscan ENV
+function sekretscan {
+    kubectl get secrets -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v default | grep -v regcred | while read x; do echo -n $x": "; sekret $x $1; done
+}
+
+# scan each pod in the namespace to see what an environment variable is set to
+# NOTE: pods need to be restarted to pick up changes in a secret object
+# usage:
+# $ envcheck ENV
 function envcheck {
-    kubectl get pods -o json | jq .items[].metadata.name -r | grep -v session | grep -v tiller | while read x; do echo -n $x": "; kubectl exec $x -- sh -c "echo \$$1"; done
+    kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v session | grep -v tiller | while read x; do echo -n $x": "; kubectl exec $x -- sh -c "echo \$$1"; done
 }
 
 function kubeaddrs {
@@ -305,8 +317,6 @@ function kuberun {
 #     local namespace=$(echo $domain | cut -d "." -f 2)
 #     kubectl --namespace=$namespace port-forward svc/$host :$port
 # }
-
-alias chartout='helm template --values helm-config/values.yaml --output-dir output helm-config'
 
 # Graph
 function g {
