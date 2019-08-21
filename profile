@@ -212,7 +212,19 @@ function kprompter {
 # kprompt
 alias kprompt='PROMPT_COMMAND=kprompter'
 
-alias kubectx='kubectl config current-context'
+function kubectx {
+    local context="$1"
+    if [ "$context" == "dev" ]
+    then
+        kubectl config use-context $KUBE_DEV
+    elif [ "$context" == "prod" ]
+    then
+        kubectl config use-context $KUBE_PROD
+    elif [ "$context" == "" ]
+    then
+        kubectl config current-context
+    fi
+}
 
 function kubesh {
     kubectl get pod session-$USER &> /dev/null
