@@ -223,7 +223,9 @@ function kubesh {
     fi
 }
 
-alias kubebounce='kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v session | grep -v tiller | xargs kubectl delete pod'
+function kubebounce {
+    kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v session | grep -v tiller | xargs kubectl delete pod
+}
 
 function secrets {
     export -f decodex
