@@ -209,7 +209,14 @@ alias kprompt='PROMPT_COMMAND=kprompter'
 
 alias kubectx='kubectl config current-context'
 
-alias kubesh='kubectl run session-$USER --restart=Never --generator=run-pod/v1 --rm -i --tty --image=centos -- bash'
+function kubesh {
+    kubectl get pod session-$USER &> /dev/null
+    if [ $? == 0 ]; then
+        kubectl exec -it session-$USER bash
+    else
+        kubectl run session-$USER --restart=Never --generator=run-pod/v1 --rm -i --tty --image=centos -- bash
+    fi
+}
 
 alias kubebounce='kubectl get pods -o json | jq .items[].metadata.name -r | grep -v session | grep -v tiller | xargs kubectl delete pod'
 
@@ -238,6 +245,10 @@ function sekretscan {
 
 function sekkeys {
     kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s\n" $k }}{{ end }}'
+}
+
+function envcheck {
+    kubectl get pods -o json | jq .items[].metadata.name -r | grep -v session | grep -v tiller | while read x; do echo -n $x": "; kubectl exec $x -- sh -c "echo \$$1"; done
 }
 
 function kubeaddrs {
