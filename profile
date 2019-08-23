@@ -121,6 +121,14 @@ function repo {
 # Productivity
 alias today='vim $HOME/today'
 
+function debug {
+  suffix=$1
+  if [ -z $suffix ]; then
+    suffix=$(date '+%Y%m%d%H%M%S')
+  fi
+  cp $HOME/template-checklist-debug debug-checklist-$suffix && vim debug-checklist-$suffix
+}
+
 # vim
 alias vim='nvim'
 
@@ -275,6 +283,26 @@ function sekretscan {
 # $ envcheck ENV
 function envcheck {
     kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v session | grep -v tiller | while read x; do echo -n $x": "; kubectl exec $x -- sh -c "echo \$$1"; done
+}
+
+function kenv {
+    kubectl exec $1 -- sh -c "echo \$$2"
+}
+
+function kat {
+    kubectl exec $1 -- sh -c "cat $2"
+}
+
+function allpods {
+    kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}'
+}
+
+function filescan {
+    allpods | grep $1 | while read x; do echo $x": "; kat $x $(kenv $x $2); done
+}
+
+function deployup {
+    kubectl patch deployment $1 -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$1"'","image":"'"$2"'"}]}}}}'
 }
 
 function kubeaddrs {
