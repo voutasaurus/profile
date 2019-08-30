@@ -126,7 +126,7 @@ function debug {
   if [ -z $suffix ]; then
     suffix=$(date '+%Y%m%d%H%M%S')
   fi
-  cp $HOME/template-checklist-debug debug-checklist-$suffix && vim debug-checklist-$suffix
+  cp $HOME/template-checklist-debug debug-checklist-$suffix && nvim debug-checklist-$suffix
 }
 
 # vim
@@ -263,6 +263,13 @@ function sekret {
 }
 
 function sekretset {
+    # check $3 is set
+    if [ $# -lt 3 ]
+    then
+        >&2 echo "please provide a secrets object, a key, and a value"
+        return 1
+    fi
+
     kubectl patch secrets $1 -p '{"data":{"'"$2"'":"'"$(echo -n $3 | base64)"'"}}'
 }
 
@@ -299,6 +306,17 @@ function allpods {
 
 function filescan {
     allpods | grep $1 | while read x; do echo $x": "; kat $x $(kenv $x $2); done
+}
+
+# restartpods will delete all the pods matching the argument
+function restartpods {
+    if [ $# -eq 0 ]
+    then
+        >&2 echo "please provide a pod type to restart"
+        return 1
+    fi
+
+    allpods | grep $1 | xargs kubectl delete pod
 }
 
 function deployup {
