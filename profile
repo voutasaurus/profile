@@ -58,6 +58,14 @@ function decodex {
     echo ""
 }
 
+function b64diff {
+    read before
+    read after
+    beforedecode=$(echo ${before#"-"} | base64 --decode)
+    afterdecode=$(echo ${after#"+"} | base64 --decode)
+    diff <(echo "$beforedecode") <(echo "$afterdecode")
+}
+
 # Time
 function epochtodate {
 	date -r $1 '+%m/%d/%Y:%H:%M:%S'
@@ -225,12 +233,17 @@ function kubectx {
     if [ "$context" == "dev" ]
     then
         kubectl config use-context $KUBE_DEV
+    elif [ "$context" == "sand" ]
+    then
+        kubectl config use-context $KUBE_SAND
     elif [ "$context" == "prod" ]
     then
         kubectl config use-context $KUBE_PROD
     elif [ "$context" == "" ]
     then
         kubectl config current-context
+    else
+        echo "context unknown"
     fi
 }
 
@@ -239,7 +252,7 @@ function kubesh {
     if [ $? == 0 ]; then
         kubectl exec -it session-$USER bash
     else
-        kubectl run session-$USER --restart=Never --generator=run-pod/v1 --rm -i --tty --image=centos -- bash
+        kubectl run session-$USER --restart=Never --generator=run-pod/v1 -i --tty --image=centos -- bash
     fi
 }
 
@@ -271,6 +284,15 @@ function sekretset {
     fi
 
     kubectl patch secrets $1 -p '{"data":{"'"$2"'":"'"$(echo -n $3 | base64)"'"}}'
+}
+
+# envtosecret reads an .env file and adds the key values to the named
+# kubernetes secret object
+# usage:
+#   $ envtosecret secretname < .env
+function envtosecret {
+    export -f sekretset
+    sed 's/#.*$//' | grep -v -e '^$' | sed 's/=/ /' | xargs -n 2 -I{} bash -c "sekretset $1 {}"
 }
 
 function sekkeys {
@@ -397,6 +419,7 @@ alias failure='notify "Failed" "operation failed" "Basso"'
 
 # docker
 function flip {
+	echo "(╯°□°）╯︵ ┻━┻"
 	docker ps -aq | xargs docker rm -f
 	docker network prune -f
 	echo "The little boat flipped over."
