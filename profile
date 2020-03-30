@@ -239,6 +239,15 @@ function kubectx {
     elif [ "$context" == "prod" ]
     then
         kubectl config use-context $KUBE_PROD
+    elif [ "$context" == "altdev" ]
+    then
+        kubectl config use-context $KUBE_ALT_DEV
+    elif [ "$context" == "altsand" ]
+    then
+        kubectl config use-context $KUBE_ALT_SAND
+    elif [ "$context" == "altprod" ]
+    then
+        kubectl config use-context $KUBE_ALT_PROD
     elif [ "$context" == "" ]
     then
         kubectl config current-context
@@ -247,13 +256,13 @@ function kubectx {
     fi
 }
 
-function kubesh {
+function kubecent {
     kubectl get pod session-$USER &> /dev/null
-    if [ $? == 0 ]; then
-        kubectl exec -it session-$USER bash
-    else
-        kubectl run session-$USER --restart=Never --generator=run-pod/v1 -i --tty --image=centos -- bash
+    if [ $? != 0 ]; then
+        kubectl run session-$USER --restart=Never --image=centos:7 -- sleep infinity
+        sleep 5
     fi
+    kubectl exec -it session-$USER bash
 }
 
 function kubebounce {
@@ -399,6 +408,15 @@ function kuberun {
 #     local namespace=$(echo $domain | cut -d "." -f 2)
 #     kubectl --namespace=$namespace port-forward svc/$host :$port
 # }
+
+function kimages {
+    if [ -z "$1" ]
+    then
+        kubectl get pod -o go-template='{{ range $v := .items }}{{ range $u := .spec.containers }}{{ printf "%s\n" $u.image }}{{ end }}{{ end }}' | sort -u
+    else
+        kubectl get pod -o go-template='{{ range $v := .items }}{{ range $u := .spec.containers }}{{ printf "%s\n" $u.image }}{{ end }}{{ end }}' | sort -u | grep $1
+    fi
+}
 
 # Graph
 function g {
