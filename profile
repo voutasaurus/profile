@@ -2,7 +2,7 @@ export PROFILE=$PROFILE:$BASH_SOURCE
 
 # Environment and Profile
 alias path='echo $PATH | tr : "\n"'
-alias ..='. ~/.bash_profile'
+alias ..='. ~/.zshrc'
 
 function exportf {
 	export $(xargs <$1)
@@ -233,6 +233,9 @@ function kubectx {
     if [ "$context" == "dev" ]
     then
         kubectl config use-context $KUBE_DEV
+    elif [ "$context" == "qa" ]
+    then
+        kubectl config use-context $KUBE_QA
     elif [ "$context" == "sand" ]
     then
         kubectl config use-context $KUBE_SAND
