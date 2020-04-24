@@ -230,28 +230,28 @@ alias kprompt='PROMPT_COMMAND=kprompter'
 
 function kubectx {
     local context="$1"
-    if [ "$context" == "dev" ]
+    if [[ "$context" == "dev" ]]
     then
         kubectl config use-context $KUBE_DEV
-    elif [ "$context" == "qa" ]
+    elif [[ "$context" == "qa" ]]
     then
         kubectl config use-context $KUBE_QA
-    elif [ "$context" == "sand" ]
+    elif [[ "$context" == "sand" ]]
     then
         kubectl config use-context $KUBE_SAND
-    elif [ "$context" == "prod" ]
+    elif [[ "$context" == "prod" ]]
     then
         kubectl config use-context $KUBE_PROD
-    elif [ "$context" == "altdev" ]
+    elif [[ "$context" == "altdev" ]]
     then
         kubectl config use-context $KUBE_ALT_DEV
-    elif [ "$context" == "altsand" ]
+    elif [[ "$context" == "altsand" ]]
     then
         kubectl config use-context $KUBE_ALT_SAND
-    elif [ "$context" == "altprod" ]
+    elif [[ "$context" == "altprod" ]]
     then
         kubectl config use-context $KUBE_ALT_PROD
-    elif [ "$context" == "" ]
+    elif [[ "$context" == "" ]]
     then
         kubectl config current-context
     else
@@ -273,8 +273,11 @@ function kubebounce {
 }
 
 function secrets {
-    export -f decodex
-    kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s %s\n" $k $v }}{{ end }}' | xargs -n 2 -I{} bash -c 'decodex {}'
+    kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s %s\n" $k $v }}{{ end }}' | while read key value; do
+        echo -n "$key="
+        echo -n "$value" | base64 --decode
+        echo ""
+    done
 }
 
 function sekret {
