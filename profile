@@ -222,7 +222,7 @@ function chartout {
 
 # To use kprompter, call kprompt to set PROMPT_COMMAND alias
 function kprompter {
-  export PS1="$(kubectl config current-context)""$ "
+  export PS1="$(date -u "+%Y-%m-%dT%H:%M:%SZ") $(kubectl config current-context)""$ "
 }
 
 # kprompt
@@ -282,7 +282,7 @@ function secrets {
 
 function sekret {
     local out=$(kubectl get secrets $1 -o go-template="{{.data.$2}}")
-    if [ "$out" == "<no value>" ]; then
+    if [[ "$out" == "<no value>" ]]; then
        >&2 echo "$2 not set in $1";
        return 1;
     fi
@@ -318,7 +318,12 @@ function sekkeys {
 # usage:
 # $ sekretscan ENV
 function sekretscan {
-    kubectl get secrets -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v default | grep -v regcred | while read x; do echo -n $x": "; sekret $x $1; done
+    kubectl get secrets -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' \
+    | grep -v default | grep -v regcred | grep -v helm | \
+    while read x; do
+        echo -n $x": "
+        sekret $x $1
+    done
 }
 
 # scan each pod in the namespace to see what an environment variable is set to
