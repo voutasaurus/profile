@@ -429,6 +429,23 @@ function kimages {
     fi
 }
 
+function pilotsql {
+    pghost=$1
+    shift
+    # launch proxy
+    kubectl run pg-tunnel-$USER --image=alpine/socat --expose=true --port=5432 tcp-listen:5432,fork,reuseaddr "tcp-connect:$pghost:5432"
+    sleep 5 # wait for pod to be ready
+    kubectl port-forward svc/pg-tunnel-$USER 5432:5432 &
+    echo "waiting for port forwarding to connect..."
+    sleep 10
+    # connect to database via localhost
+    psql -h localhost $@
+    # cleanup local and remote resources
+    lsof -ti tcp:5432 | xargs kill -9
+    kubectl delete service/pg-tunnel-$USER
+    kubectl delete deployment.apps/pg-tunnel-$USER
+}
+
 # Graph
 function g {
 	dot -Tsvg $1 > o.svg
