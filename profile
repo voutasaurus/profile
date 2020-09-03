@@ -259,6 +259,9 @@ function kubectx {
     fi
 }
 
+# list all kubernetes contexts (uses https://github.com/mikefarah/yq - beware the syntax is not jq syntax)
+alias kubectxs='yq r ~/.kube/config "contexts.*.name"'
+
 function kubecent {
     kubectl get pod session-$USER &> /dev/null
     if [ $? != 0 ]; then
