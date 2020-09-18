@@ -432,6 +432,14 @@ function kimages {
     fi
 }
 
+# pilotsql
+# Requirements:
+#   postgresql installed locally
+#   kubectl installed locally
+#   connected to kubernetes cluster with pod and service creation permissions
+#   postgres server available to kubernetes pods via internal hostname
+# Usage:
+#   pilotsql internalhostname -U user -d database
 function pilotsql {
     pghost=$1
     shift
@@ -447,6 +455,12 @@ function pilotsql {
     lsof -ti tcp:5432 | xargs kill -9
     kubectl delete service/pg-tunnel-$USER
     kubectl delete deployment.apps/pg-tunnel-$USER
+}
+
+# poll local service on port $1 (used as keep-alive for port-forward
+# connections)
+function polloc {
+    while true ; do nc -vz localhost $1 ; sleep 10 ; done
 }
 
 # Graph
