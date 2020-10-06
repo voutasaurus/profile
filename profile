@@ -242,20 +242,11 @@ function kubectx {
     elif [[ "$context" == "prod" ]]
     then
         kubectl config use-context $KUBE_PROD
-    elif [[ "$context" == "altdev" ]]
-    then
-        kubectl config use-context $KUBE_ALT_DEV
-    elif [[ "$context" == "altsand" ]]
-    then
-        kubectl config use-context $KUBE_ALT_SAND
-    elif [[ "$context" == "altprod" ]]
-    then
-        kubectl config use-context $KUBE_ALT_PROD
     elif [[ "$context" == "" ]]
     then
         kubectl config current-context
     else
-        echo "context unknown"
+        kubectl config use-context $1
     fi
 }
 
