@@ -126,6 +126,40 @@ function repo {
 	cd $1
 }
 
+function semverpluspatch {
+    local v="${1:?Specify current version}"
+    major=$(echo $v | cut -f 1 -d .)
+    minor=$(echo $v | cut -f 2 -d .)
+    patch=$(echo $v | cut -f 3 -d .)
+    let "patch = $patch + 1"
+    echo "$major.$minor.$patch"
+}
+
+function tagcurrent {
+    message=${1:?"Please provide tag message"}
+    tag=$(git tag --points-at HEAD 2> /dev/null)
+    if [ ! -z "$tag" ]; then
+        echo "-z $tag"
+        return
+    fi
+    latest="0.0.0"
+    tagsha=$(git rev-list --tags --max-count=1)
+    if [ ! -z "$tagsha" ]; then
+        latest=$(git describe --abbrev=0 --tags $tagsha)
+    fi
+    next=$(semverpluspatch $latest)
+    git tag -a $next -m $message
+    echo $next
+}
+
+function pushtag {
+    message=${1:?"Please provide tag message"}
+    git checkout master
+    git pull
+    tagcurrent $message
+    git push --tags
+}
+
 # Productivity
 alias today='vim $HOME/today'
 
