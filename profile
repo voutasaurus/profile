@@ -45,7 +45,8 @@ alias retire='disown -a && exit'
 alias please='yes |'
 
 # Random
-alias pp='base64 < /dev/urandom | head -c'
+alias pp='base64 < /dev/urandom | tr -d '+/' | head -c'
+alias pp1='base64 < /dev/urandom | head -c'
 function pp2 {
 	head /dev/urandom | LC_ALL=C tr -dc A-Za-z0-9 | head -c $1 ; echo ''
 }
@@ -249,155 +250,7 @@ function getgo {
 	$d/exec
 }
 
-# Kubernetes
-function chartout {
-    stat helm-config >/dev/null && \
-    mkdir -p output && \
-    helm template --values helm-config/values.yaml --output-dir output helm-config
-}
-
-# To use kprompter, call kprompt to set PROMPT_COMMAND alias
-function kprompter {
-  export PS1="$(date -u "+%Y-%m-%dT%H:%M:%SZ") $(kubectl config current-context)""$ "
-}
-
-# kprompt
-alias kprompt='PROMPT_COMMAND=kprompter'
-
-function kubectx {
-    local context="$1"
-    if [[ "$context" == "dev" ]]
-    then
-        kubectl config use-context $KUBE_DEV
-    elif [[ "$context" == "qa" ]]
-    then
-        kubectl config use-context $KUBE_QA
-    elif [[ "$context" == "sand" ]]
-    then
-        kubectl config use-context $KUBE_SAND
-    elif [[ "$context" == "prod" ]]
-    then
-        kubectl config use-context $KUBE_PROD
-    elif [[ "$context" == "" ]]
-    then
-        kubectl config current-context
-    else
-        kubectl config use-context $1
-    fi
-}
-
-# list all kubernetes contexts (uses https://github.com/mikefarah/yq - beware the syntax is not jq syntax)
-alias kubectxs='yq r ~/.kube/config "contexts.*.name"'
-
-function kubecent {
-    kubectl get pod session-$USER &> /dev/null
-    if [ $? != 0 ]; then
-        kubectl run session-$USER --restart=Never --image=centos:7 -- sleep infinity
-        sleep 5
-    fi
-    kubectl exec -it session-$USER bash
-}
-
-function kubebounce {
-    kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v session | grep -v tiller | xargs kubectl delete pod
-}
-
-function secrets {
-    kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s %s\n" $k $v }}{{ end }}' | while read key value; do
-        echo -n "$key="
-        echo -n "$value" | base64 --decode
-        echo ""
-    done
-}
-
-function sekret {
-    local out=$(kubectl get secrets $1 -o go-template="{{.data.$2}}")
-    if [[ "$out" == "<no value>" ]]; then
-       >&2 echo "$2 not set in $1";
-       return 1;
-    fi
-    echo -n $out | base64 --decode
-    >&2 echo ""
-}
-
-function sekretset {
-    # check $3 is set
-    if [ $# -lt 3 ]
-    then
-        >&2 echo "please provide a secrets object, a key, and a value"
-        return 1
-    fi
-
-    kubectl patch secrets $1 -p '{"data":{"'"$2"'":"'"$(echo -n $3 | base64)"'"}}'
-}
-
-# envtosecret reads an .env file and adds the key values to the named
-# kubernetes secret object
-# usage:
-#   $ envtosecret secretname < .env
-function envtosecret {
-    export -f sekretset
-    sed 's/#.*$//' | grep -v -e '^$' | sed 's/=/ /' | xargs -n 2 -I{} bash -c "sekretset $1 {}"
-}
-
-function sekkeys {
-    kubectl get secrets $1 -o go-template='{{ range $k, $v := .data }}{{ printf "%s\n" $k }}{{ end }}'
-}
-
-# scan each secret object to see what an environment variable is set to
-# usage:
-# $ sekretscan ENV
-function sekretscan {
-    kubectl get secrets -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' \
-    | grep -v default | grep -v regcred | grep -v helm | \
-    while read x; do
-        echo -n $x": "
-        sekret $x $1
-    done
-}
-
-# scan each pod in the namespace to see what an environment variable is set to
-# NOTE: pods need to be restarted to pick up changes in a secret object
-# usage:
-# $ envcheck ENV
-function envcheck {
-    kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}' | grep -v session | grep -v tiller | while read x; do echo -n $x": "; kubectl exec $x -- sh -c "echo \$$1"; done
-}
-
-function kenv {
-    kubectl exec $1 -- sh -c "echo \$$2"
-}
-
-function kat {
-    kubectl exec $1 -- sh -c "cat $2"
-}
-
-function allpods {
-    kubectl get pods -o go-template='{{ range $v := .items }}{{ printf "%s\n" $v.metadata.name }}{{ end }}'
-}
-
-function filescan {
-    allpods | grep $1 | while read x; do echo $x": "; kat $x $(kenv $x $2); done
-}
-
-# restartpods will delete all the pods matching the argument
-function restartpods {
-    if [ $# -eq 0 ]
-    then
-        >&2 echo "please provide a pod type to restart"
-        return 1
-    fi
-
-    allpods | grep $1 | xargs kubectl delete pod
-}
-
-function deployup {
-    kubectl patch deployment $1 -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$1"'","image":"'"$2"'"}]}}}}'
-}
-
-function kubeaddrs {
-    kubectl get services -o go-template='{{ range $x, $v := .items }}{{range $j, $port := $v.spec.ports}}{{printf "%s:%v\n" $v.metadata.name $port.port}}{{end}}{{ end }}'
-}
+# Kubernetes (see k8s.sh for more relevant ones, these ones are less used)
 
 alias kubedns='kubectl get pods --namespace=kube-system -l k8s-app=kube-dns'
 
@@ -449,40 +302,6 @@ function kuberun {
 #     local namespace=$(echo $domain | cut -d "." -f 2)
 #     kubectl --namespace=$namespace port-forward svc/$host :$port
 # }
-
-function kimages {
-    if [ -z "$1" ]
-    then
-        kubectl get pod -o go-template='{{ range $v := .items }}{{ range $u := .spec.containers }}{{ printf "%s\n" $u.image }}{{ end }}{{ end }}' | sort -u
-    else
-        kubectl get pod -o go-template='{{ range $v := .items }}{{ range $u := .spec.containers }}{{ printf "%s\n" $u.image }}{{ end }}{{ end }}' | sort -u | grep $1
-    fi
-}
-
-# pilotsql
-# Requirements:
-#   postgresql installed locally
-#   kubectl installed locally
-#   connected to kubernetes cluster with pod and service creation permissions
-#   postgres server available to kubernetes pods via internal hostname
-# Usage:
-#   pilotsql internalhostname -U user -d database
-function pilotsql {
-    pghost=$1
-    shift
-    # launch proxy
-    kubectl run pg-tunnel-$USER --image=alpine/socat --expose=true --port=5432 tcp-listen:5432,fork,reuseaddr "tcp-connect:$pghost:5432"
-    sleep 5 # wait for pod to be ready
-    kubectl port-forward pod/pg-tunnel-$USER 5432:5432 &
-    echo "waiting for port forwarding to connect..."
-    sleep 10
-    # connect to database via localhost
-    psql -h localhost $@
-    # cleanup local and remote resources
-    lsof -ti tcp:5432 | xargs kill -9
-    kubectl delete pod/pg-tunnel-$USER
-    kubectl delete svc/pg-tunnel-$USER
-}
 
 # poll local service on port $1 (used as keep-alive for port-forward
 # connections)
