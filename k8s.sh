@@ -148,6 +148,14 @@ function kenv {
     kubectl exec $1 -- sh -c "echo \$$2"
 }
 
+# kenvc allows for querying individual containers in a pod apart from the default one
+# usage:
+# $ kenv pod-name container-name ENV_VAR
+# this-is-the-value-of-an-environment-variable
+function kenvc {
+    kubectl exec $1 --container $2 -- sh -c "echo \$$3"
+}
+
 # kat prints the current file contents for a particular pod and filepath
 # usage:
 # $ kat pod-name /file/path
