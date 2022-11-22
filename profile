@@ -330,6 +330,15 @@ function notify {
 alias success='notify "Success" "operation completed successfully" "Hero"'
 alias failure='notify "Failed" "operation failed" "Basso"'
 
+# database
+
+function blatt {
+	echo "deleting $1"
+	psql -c "drop database $1"
+	echo "restoring $1 from $1_ref"
+	psql -c "create database $1 with template $1_ref"
+}
+
 # docker
 function flip {
 	echo "(╯°□°）╯︵ ┻━┻"
