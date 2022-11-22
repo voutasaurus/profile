@@ -89,6 +89,8 @@ function ca {
 	cat $1
 }
 
+alias timestamp='date +%Y%m%d%H%M%S'
+
 alias utc='date -u "+%Y-%m-%dT%H:%M:%SZ"'
 
 alias mkdate='mkdir $(date +%Y%m%d-%H%M%S)'
@@ -103,6 +105,8 @@ function touchx {
 	touch $1
 	chmod +x $1
 }
+
+alias sha=sha256sum
 
 # usage: envset VERSION 1.0.0 env.sh
 function envset {
