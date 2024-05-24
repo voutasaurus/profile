@@ -117,6 +117,15 @@ function pb {
 }
 
 # Git
+function gitsetup {
+    git config --global alias.st 'status'
+    git config --global alias.unstage 'reset HEAD --'
+    git config --global alias.hide 'update-index --assume-unchanged'
+    git config --global alias.unhide 'update-index --no-assume-unchanged'
+    git config --global alias.hidden '! git ls-files -v | grep ^h | cut -c3-'
+    git config --global alias.aliases 'config --get-regexp ^alias'
+}
+
 alias gitlog='git log --pretty=oneline --abbrev-commit'
 
 function changes {
