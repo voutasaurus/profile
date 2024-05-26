@@ -51,6 +51,8 @@ function pp2 {
 	head /dev/urandom | LC_ALL=C tr -dc A-Za-z0-9 | head -c $1 ; echo ''
 }
 
+alias uuid='pp2 32'
+
 # base64
 
 function decodex {
