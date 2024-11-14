@@ -1,13 +1,17 @@
-export NONTHIMBLEPATH="$PATH"
 export PREV_WD=`pwd`
+export THIMBLEROOT="$HOME/.thimblerig"
+export THIMBLEPATH="$THIMBLEROOT`pwd`"
 
 function augment_path {
     if [ "$PWD" = "$PREV_WD" ]; then return 0; fi;
 
-    THIMBLEPATH="$HOME/.thimblerig`pwd`"
+    # Unlist previous thimblepaths
+    export PATH=$(echo $PATH | tr ":" "\n" | sed "s|^$THIMBLEROOT.*$||g" | sed "/^[[:space:]]*$/d" | tr "\n" ":")
+
+    export THIMBLEPATH="$THIMBLEROOT`pwd`"
     mkdir -p $THIMBLEPATH
 #	>&2 echo "thimblerig: adding to PATH $THIMBLEPATH"
-    export PATH="$THIMBLEPATH:$NONTHIMBLEPATH"
+    export PATH="$THIMBLEPATH:$PATH"
     export PREV_WD=`pwd`
 }
 
