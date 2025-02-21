@@ -18,7 +18,7 @@ function kubectx {
     fi
 }
 
-alias kubectxs='yq r ~/.kube/config "contexts.*.name"'
+alias kubectxs='yq ".contexts.[].name" ~/.kube/config'
 
 # Launch a shell in k8s
 # usage:
