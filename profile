@@ -53,6 +53,9 @@ function pp2 {
 
 alias uuid='pp2 32'
 
+# 32 character hex string
+alias guid='xxd -l 16 -p /dev/random'
+
 # base64
 
 function decodex {
